@@ -49,6 +49,15 @@ class L10nEsAeatMod303Report(models.Model):
              "Autonomous Community of Navarra, will enter in this box the "
              "percentage of volume operations in the common territory. "
              "Other taxpayers will enter in this box 100%")
+
+    # 61. Operaciones no sujetas y con inversión del sujeto pasivo que originan el derecho a deducción
+    # Liquidación (3) - RS - Cuotas devengadas - IVA devengado por inversión del sujeto pasivo [53]
+
+    casilla_61 = fields.Float(
+        string="[61] No sujetas ISP o reglas de localización",
+        readonly=True, compute='_compute_casilla_61',
+        help="", store=True)
+
     atribuible_estado = fields.Float(
         string="[66] Attributable to the Administration", readonly=True,
         compute='_compute_atribuible_estado', store=True)
@@ -66,6 +75,7 @@ class L10nEsAeatMod303Report(models.Model):
              "Economic Agreement approved between the State and the "
              "Autonomous Community the Basque Country and the "
              "Economic Agreement between the State and Navarre.")
+
     casilla_69 = fields.Float(
         string="[69] Result", readonly=True, compute='_compute_casilla_69',
         help="[66] Attributable to the Administration - "
@@ -265,6 +275,14 @@ class L10nEsAeatMod303Report(models.Model):
         for report in self:
             report.atribuible_estado = (
                 report.casilla_46 * report.porcentaje_atribuible_estado / 100.)
+
+    @api.multi
+    @api.depends('tax_line_ids', 'tax_line_ids.amount')
+    def _compute_casilla_61(self):
+        for report in self:
+            tax_lines = report.tax_line_ids.filtered(
+                lambda x: x.field_number == 61)
+            report.casilla_61 = sum(tax_lines.mapped('amount'))
 
     @api.multi
     @api.depends('atribuible_estado', 'cuota_compensar',

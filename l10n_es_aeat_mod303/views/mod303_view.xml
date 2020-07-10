@@ -108,6 +108,9 @@
                             />
                 </group>
                 <group>
+                    <field name="casilla_61"
+                           widget="monetary"
+                           options="{'currency_field': 'currency_id'}"/>
                     <field name="porcentaje_atribuible_estado"/>
                     <field name="atribuible_estado"
                            widget="monetary"
